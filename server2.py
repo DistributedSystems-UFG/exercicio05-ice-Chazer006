@@ -6,15 +6,27 @@ class PrinterI(Demo.Printer):
         self.t = t
         
     def printString(self, s, current=None):
-        print(self.t, s)
+        print(f"{self.t} {s}")
 
-communicator = Ice.initialize(sys.argv) 
+    def add(self, a, b, current=None):
+        return a + b
 
-adapter = communicator.createObjectAdapterWithEndpoints("SimpleAdapter", "default -p 11000")
-object1 = PrinterI("Object1 says:")
-object2 = PrinterI("Object2 says:")
-adapter.add(object1, communicator.stringToIdentity("SimplePrinter1"))
-adapter.add(object2, communicator.stringToIdentity("SimplePrinter2"))
-adapter.activate()
+    def sub(self, a, b, current=None):
+        return a - b
 
-communicator.waitForShutdown()
+class LoggerI(Demo.Logger):
+    def log(self, message, current=None):
+        print(f"[LOG]: {message}")
+
+with Ice.initialize(sys.argv) as communicator:
+    adapter = communicator.createObjectAdapterWithEndpoints("SimpleAdapter", "default -p 11000")
+    
+    object1 = PrinterI("Object1:")
+    adapter.add(object1, communicator.stringToIdentity("SimplePrinter1"))
+    
+    novo_logger = LoggerI()
+    adapter.add(novo_logger, communicator.stringToIdentity("MeuLogger"))
+    
+    adapter.activate()
+    print("Servidor pronto e com novos serviços ativos...")
+    communicator.waitForShutdown()
