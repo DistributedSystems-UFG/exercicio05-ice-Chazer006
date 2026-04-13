@@ -1,16 +1,19 @@
 import sys, Ice
 import Demo
  
-communicator = Ice.initialize(sys.argv)
+with Ice.initialize(sys.argv) as communicator:
+    base1 = communicator.stringToProxy("SimplePrinter1:tcp -h 127.0.0.1 -p 11000")
+    printer1 = Demo.PrinterPrx.checkedCast(base1)
+    
+    base_log = communicator.stringToProxy("MeuLogger:tcp -h 127.0.0.1 -p 11000")
+    logger = Demo.LoggerPrx.checkedCast(base_log)
 
-base1 = communicator.stringToProxy("SimplePrinter1:tcp -h 98.90.53.6 -p 11000")
-base2 = communicator.stringToProxy("SimplePrinter2:tcp -h 98.90.53.6 -p 11000")
-printer1 = Demo.PrinterPrx.checkedCast(base1)
-printer2 = Demo.PrinterPrx.checkedCast(base2)
-if (not printer1) or (not printer2):
-    raise RuntimeError("Invalid proxy")
+    if not printer1 or not logger:
+        raise RuntimeError("Erro ao conectar nos servidores")
 
-printer1.printString("Hello World from printer1!")
-printer2.printString("Hello World from printer2!")
+    res_soma = printer1.add(30, 12)
+    res_sub  = printer1.sub(100, 45)
+    
+    printer1.printString(f"Calculado no servidor: Soma={res_soma}, Sub={res_sub}")
 
-communicator.waitForShutdown()
+    logger.log("O cliente chamou as novas funções matemáticas com sucesso!")
