@@ -1,12 +1,12 @@
 import sys, Ice
 import Demo
- 
+
 class PrinterI(Demo.Printer):
     def __init__(self, t):
         self.t = t
         
     def printString(self, s, current=None):
-        print(f"{self.t} {s}")
+        print(f"{self.t} {s}") [cite: 2]
 
     def add(self, a, b, current=None):
         return a + b
@@ -22,11 +22,11 @@ with Ice.initialize(sys.argv) as communicator:
     adapter = communicator.createObjectAdapterWithEndpoints("SimpleAdapter", "default -p 11000")
     
     object1 = PrinterI("Object1:")
-    adapter.add(object1, communicator.stringToIdentity("SimplePrinter1"))
+    adapter.add(object1, communicator.stringToIdentity("SimplePrinter1")) [cite: 2]
     
-    novo_logger = LoggerI()
-    adapter.add(novo_logger, communicator.stringToIdentity("MeuLogger"))
+    logger_obj = LoggerI()
+    adapter.add(logger_obj, communicator.stringToIdentity("MeuLogger"))
     
-    adapter.activate()
-    print("Servidor pronto e com novos serviços ativos...")
-    communicator.waitForShutdown()
+    adapter.activate() [cite: 2]
+    print("Servidor rodando...")
+    communicator.waitForShutdown() [cite: 2]
